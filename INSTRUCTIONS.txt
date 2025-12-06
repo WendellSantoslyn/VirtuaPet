@@ -1,0 +1,8 @@
+Executando o Projeto:
+
+1- Crie um virtualenv e instale dependências: pip install -r requirements.txt.
+2- Coloque trainer/trainer.yml e trainer/labels.json na pasta trainer/.
+3- Coloque models/avatar.glb na pasta models/.
+4- Rode: python app.py.
+5- Abra no navegador "http://localhost:5000/" — permita acessar a câmera quando solicitado (se optar por usar a câmera
+do browser). O servidor envia eventos de reconhecimento que fazem o .glb alternar animações.
