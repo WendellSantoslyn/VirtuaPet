@@ -1,63 +1,47 @@
 import os
-import json
+#import json
 import cv2
 import numpy as np
+from PIL import Image
 
-DATASET_DIR = "dataset"
-RECOGNIZER_DIR = "../recognizer"
+training_path = "dataset"
 
-os.makedirs(RECOGNIZER_DIR, exist_ok=True)
+def get_image_data(path_train):
+  subdirs = [os.path.join(path_train, f) for f in os.listdir(path_train)]
+  #print(subdirs)
+  faces = []
+  ids = []
 
-# Criar detector HaarCascade
-face_cascade = cv2.CascadeClassifier(
-    cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
-)
+  face_names = {}
+  id = 1   # current id  (starting id)
+  print("Loading faces from training set...")
+  for subdir in subdirs:
+    name = os.path.split(subdir)[1]
 
-recognizer = cv2.face.LBPHFaceRecognizer_create()
+    images_list = [os.path.join(subdir, f) for f in os.listdir(subdir)]
+    for path in images_list:
+      image = Image.open(path).convert('L')
+      face = np.array(image, 'uint8')
+      face = cv2.resize(face, (90, 120))
+      print(str(id) + " <-- " + path)
+      ids.append(id)
+      faces.append(face)
+      cv2.imshow("Training faces...", face)
+      cv2.waitKey(50)
 
-current_id = 0
-labels = {}
-faces = []
-ids = []
+    if not name in face_names:
+      face_names[name] = id
+      id += 1
 
-print("🔍 Lendo dataset…")
+  return np.array(ids), faces, face_names
 
-for root, dirs, files in os.walk(DATASET_DIR):
-    for file in files:
-        if file.lower().endswith(("jpg", "jpeg", "png", "bmp")):
+ids, faces, face_names = get_image_data(training_path)
 
-            path = os.path.join(root, file)
-            label = os.path.basename(root)  # nome da pasta = nome da pessoa
+print(ids)
+print(len(faces))
 
-            if label not in labels:
-                labels[label] = current_id
-                current_id += 1
-
-            image = cv2.imread(path)
-            gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-
-            # Detectar rosto
-            faces_rect = face_cascade.detectMultiScale(gray, scaleFactor=1.2, minNeighbors=5)
-
-            for (x, y, w, h) in faces_rect:
-                roi = gray[y:y + h, x:x + w]
-                faces.append(roi)
-                ids.append(labels[label])
-
-print(f"📊 Total de faces detectadas: {len(faces)}")
-print(f"👤 Labels gerados: {labels}")
-
-# Treinar modelo LBPH
-if len(faces) > 0:
-    recognizer.train(faces, np.array(ids))
-    recognizer.save(os.path.join(RECOGNIZER_DIR, "trainer.yml"))
-    print("✔️ Modelo LBPH salvo em recognizer/trainer.yml")
-else:
-    print("❌ Nenhuma face encontrada. Verifique o dataset.")
-
-# Salvar labels.json
-with open(os.path.join(RECOGNIZER_DIR, "labels.json"), "w") as f:
-    json.dump(labels, f, indent=4)
-
-print("✔️ labels.json salvo em recognizer/labels.json")
-print("🏁 Finalizado!")
+print('Training LBPH recognizer......')
+lbph_classifier = cv2.face.LBPHFaceRecognizer_create()
+lbph_classifier.train(faces, ids)
+lbph_classifier.write('lbph_classifier.yml')
+print('... Completed!\n')
