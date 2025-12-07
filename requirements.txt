@@ -1,5 +1,7 @@
-flask
-flask-socketio
-eventlet
-opencv-python
+pyqt6-sip
+#opencv-python
+opencv-contrib-python
+PyQt6
+pyrender
+trimesh
 numpy
