@@ -1,0 +1,7 @@
+pyqt6-sip
+#opencv-python
+opencv-contrib-python
+PyQt6
+pyrender
+trimesh
+numpy

@@ -1,0 +1,9 @@
+Executando o Projeto:
+
+1- Crie um virtualenv: 'python -m venv .venv';
+2- Instale as dependências: 'pip install -r requirements.txt';
+3- Crie uma pasta "dataset" em "VirtuaPet/recognizer" e coloque as imagens para reconhecimento facial;
+4- Coloque "haarcascade_frontalface_default.xml" em "VirtuaPet/recognizer";
+5- Coloque "trainer.yml" e "labels.json" na pasta "recognizer", ou rode o arquivo "train_lpbh.py" para criá-los;
+6- Coloque "pet_*.glb" na pasta "models", substituindo * pelo nome da cor em inglês;
+7- Rode o arquivo "app.py".
